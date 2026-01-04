@@ -1,3 +1,18 @@
+
+   .text-box {
+      width: 300px;              
+      padding: 2px;              
+      border: 2px solid #FF5722; 
+      border-radius: 12px;        
+      background: #FFF3E0;        
+      font-family: 'SolaimanLipi', Arial, sans-serif; /* Bangla-friendly font */
+      font-size: 10px;            
+      color: #BF360C;             
+      text-align: center;
+      box-shadow: 3px 3px 12px rgba(0,0,0,0.2); 
+      margin: 5px auto;          /* Box page-er center-e */
+    } 
+
 /* ভিডিও কন্টেইনার */
 .video-container {
     position: relative;
