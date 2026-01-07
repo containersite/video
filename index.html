@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="UTF-8">
   <title>Redirecting...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
     body {
       margin: 0;
@@ -17,43 +16,61 @@
     }
   </style>
 </head>
-
 <body>
   <h2>Wait while redirecting...</h2>
 
   <script>
-    /************** SETTINGS **************/
-    const OFFER_URL = "https://www.offers.com/";
-    const REDIRECT_DELAY = 800; // ms
+    /******** SETTINGS ********/
+    const CLICK_CODE = "wen25tvh";
+    const REDIRECT_DELAY = 800; // milliseconds
 
-    /************** TRACKING **************/
+    /******** OFFERS ********/
+    const OFFERS = [
+      "https://offer-a.com/" + CLICK_CODE + "/123",
+      "https://offer-b.com/" + CLICK_CODE + "/456"
+    ];
+
+    /******** TRACKING ********/
     function track(event) {
       console.log("[TRACK]", event);
-      // future: fetch / pixel / api call
     }
 
-    /************** PAGE LOAD **************/
-    track("page_load");
+    /******** STATE ********/
+    let offerIndex = sessionStorage.getItem("offerIndex");
+    if (offerIndex === null) {
+      offerIndex = 0; // প্রথমবার ওয়েবসাইটে ঢুকলে Offer A
+    } else {
+      // Back button চাপলে next offer
+      offerIndex = (parseInt(offerIndex) + 1) % OFFERS.length;
+    }
+    sessionStorage.setItem("offerIndex", offerIndex);
 
-    // history hijack (back button control)
+    const redirectUrl = OFFERS[offerIndex];
+
+    /******** PAGE LOAD ********/
+    track("page_load -> Offer " + (offerIndex + 1));
+
+    // history hijack
     history.pushState({ trapped: true }, "", location.href);
 
-    // initial redirect
     setTimeout(() => {
-      track("redirect_page_load");
-      window.location.replace(OFFER_URL);
+      track("redirect -> Offer " + (offerIndex + 1));
+      window.location.replace(redirectUrl);
     }, REDIRECT_DELAY);
 
-    /************** BACK BUTTON REDIRECT **************/
+    /******** BACK BUTTON ********/
     window.addEventListener("popstate", function () {
       track("back_button");
 
-      // re‑inject fake history
       history.pushState({ trapped: true }, "", location.href);
 
+      // next offer redirect
+      let nextIndex = (parseInt(sessionStorage.getItem("offerIndex")) + 1) % OFFERS.length;
+      sessionStorage.setItem("offerIndex", nextIndex);
+
       setTimeout(() => {
-        track("redirect_back");
-        window.location.replace(OFFER_URL);
+        track("redirect_back -> Offer " + (nextIndex + 1));
+        window.location.replace(OFFERS[nextIndex]);
       }, 300);
     });
   </script>
